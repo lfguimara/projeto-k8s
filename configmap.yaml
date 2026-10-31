@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-config
+data:
+  app_name: "My Web Application"
+  app_env: "production"
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>${APP_NAME}</title>
+    </head>
+    <body>
+        <h1>Welcome to ${APP_NAME}!</h1>
+        <p>Environment: ${APP_ENV}</p>
+    </body>
+    </html>

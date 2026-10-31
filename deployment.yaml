@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-pod-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          resources:
+              requests:
+                cpu: "50m"
+                memory: "64Mi"
+              limits:
+                cpu: "200m"
+                memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          env:
+              - name: APP_NAME
+                valueFrom:
+                  configMapKeyRef:
+                    name: web-config
+                    key: app_name
+              - name: APP_ENV
+                valueFrom:
+                  configMapKeyRef:
+                    name: web-config
+                    key: app_env
+              - name: DB_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: db-secret
+                    key: password
+          volumeMounts:
+              - name: pagina
+                mountPath: /usr/share/nginx/html
+      volumes:
+        - name: pagina
+          configMap:
+            name: web-config
+            items:
+              - key: index.html
+                path: index.html
